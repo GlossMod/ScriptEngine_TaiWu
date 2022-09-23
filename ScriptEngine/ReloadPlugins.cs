@@ -122,11 +122,11 @@ namespace ScriptEngine
 
             var defaultResolver = new DefaultAssemblyResolver();
             defaultResolver.AddSearchDirectory(scirptsPath);
-            
+
             var dll = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { AssemblyResolver = defaultResolver });
             dll.Name.Name = $"{dll.Name.Name}-{DateTime.Now.Ticks}";
 
-            Debug.Log($"dll.Name.Name : {dll.Name.Name}");
+            //Debug.Log($"dll.Name.Name : {dll.Name.Name}");
 
             var ms = new MemoryStream();
             dll.Write(ms);
@@ -149,22 +149,32 @@ namespace ScriptEngine
                                 string file = Path.Combine(scirptsPath, $"{item.Name}.dll");
                                 if (File.Exists(file))
                                 {
-                                    Assembly.LoadFile(file);
+                                    var dllLibs = AssemblyDefinition.ReadAssembly(file, new ReaderParameters { AssemblyResolver = defaultResolver });
+                                    dllLibs.Name.Name = $"{dllLibs.Name.Name}";
+                                    var ms2 = new MemoryStream();
+                                    dllLibs.Write(ms2);
+                                    var ass2 = Assembly.Load(ms2.ToArray());
+
                                     Debug.Log($"加载依赖 {item.Name} 成功");
+                                    //var fas = Assembly.Load(path);
+
+                                    // 将依赖附加上原dll上
+                                    dll.MainModule.AssemblyReferences.Add(dllLibs.MainModule.AssemblyReferences[0]);
+                                    // 解除原dll的占用
+                                    dllLibs.Dispose();
+                                    
                                 }
-                                
+
                             }
                             catch (Exception e)
                             {
                                 Debug.Log($"加载依赖 {item.Name} 失败");
-                            }
-                           
+                            }                           
                         }
-
                         scriptManager.AddComponent(type);
                         Debug.Log($"加载 {path} 成功");
                     }
-                }
+                }               
             }
             dll.Dispose();
         }
