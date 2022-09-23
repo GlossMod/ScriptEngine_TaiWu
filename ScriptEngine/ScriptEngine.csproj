@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>F:\steam\steamapps\common\太吾绘卷 The Scroll Of Taiwu 功能测试\Mod\ScriptEngine\Plugins\</OutputPath>
+    <OutputPath>F:\steam\steamapps\common\The Scroll Of Taiwu\Mod\ScriptEngine\Plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

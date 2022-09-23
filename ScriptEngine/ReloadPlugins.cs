@@ -118,8 +118,10 @@ namespace ScriptEngine
         {
             Debug.Log($"开始加载 {path}");
 
+            string scirptsPath = Path.Combine(ModManager.GetModRootFolder(), "scirpts");
+
             var defaultResolver = new DefaultAssemblyResolver();
-            defaultResolver.AddSearchDirectory(Path.Combine(ModManager.GetModRootFolder(), "scirpts"));
+            defaultResolver.AddSearchDirectory(scirptsPath);
             
             var dll = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { AssemblyResolver = defaultResolver });
             dll.Name.Name = $"{dll.Name.Name}-{DateTime.Now.Ticks}";
@@ -137,6 +139,28 @@ namespace ScriptEngine
                     // 判断是否继承自 MonoBehaviour
                     if (type.IsSubclassOf(typeof(MonoBehaviour)))
                     {
+                        //Debug.Log($"依赖数量:{ass.GetReferencedAssemblies().Length}");
+                        // 加载相关依赖                        
+                        foreach (var item in ass.GetReferencedAssemblies())
+                        {
+                            
+                            try
+                            {
+                                string file = Path.Combine(scirptsPath, $"{item.Name}.dll");
+                                if (File.Exists(file))
+                                {
+                                    Assembly.LoadFile(file);
+                                    Debug.Log($"加载依赖 {item.Name} 成功");
+                                }
+                                
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.Log($"加载依赖 {item.Name} 失败");
+                            }
+                           
+                        }
+
                         scriptManager.AddComponent(type);
                         Debug.Log($"加载 {path} 成功");
                     }
